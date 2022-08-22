@@ -9,16 +9,15 @@ PASSWORD = passwords.PASSWORD
 TEAMNUM = int(input("Enter your team number: "))
 # need teamnum checker
 
-print("Enter your team's event codes. Enter done when finished.")
-codes = []
-while True:
-    code = input("Enter an event code: ")
-    if code.lower() == "done":
-        break
-    # need code checker
-    codes.append(code)
+events = r.get(f"https://ftc-api.firstinspires.org/v2.0/2021/events?teamNumber={TEAMNUM}", auth=(USERNAME, PASSWORD))
+events = events.text
+events = json.loads(events)
 
-scores = []
+codes = []
+for event in events["events"]:
+    codes.append(event["code"])
+
+scores = {}
 for event in codes:
     matches = r.get(f"http://ftc-api.firstinspires.org/v2.0/{SEASON}/matches/{event}", auth=(USERNAME, PASSWORD))
     matches = matches.text
@@ -27,13 +26,25 @@ for event in codes:
         for team in match["teams"]:
             if team["teamNumber"] == TEAMNUM:
                 if team["station"] == "Red1":
-                    scores.append({match["teams"][1]["teamNumber"] : match["scoreRedFinal"]})
+                    if match["teams"][1]["teamNumber"] not in scores:
+                        scores[match["teams"][1]["teamNumber"]] = [match["scoreRedFinal"]]
+                    else:
+                        scores[match["teams"][1]["teamNumber"]].append(match["scoreRedFinal"])
                 elif team["station"] == "Red2":
-                    scores.append({match["teams"][0]["teamNumber"] : match["scoreRedFinal"]})
+                    if match["teams"][0]["teamNumber"] not in scores:
+                        scores[match["teams"][0]["teamNumber"]] = [match["scoreRedFinal"]]
+                    else:
+                        scores[match["teams"][0]["teamNumber"]].append(match["scoreRedFinal"])
                 elif team["station"] == "Blue1":
-                    scores.append({match["teams"][3]["teamNumber"] : match["scoreBlueFinal"]})
+                    if match["teams"][3]["teamNumber"] not in scores:
+                        scores[match["teams"][3]["teamNumber"]] = [match["scoreBlueFinal"]]
+                    else:
+                        scores[match["teams"][3]["teamNumber"]].append(match["scoreBlueFinal"])
                 elif team["station"] == "Blue2":
-                    scores.append({match["teams"][2]["teamNumber"] : match["scoreBlueFinal"]})
+                    if match["teams"][2]["teamNumber"] not in scores:
+                        scores[match["teams"][2]["teamNumber"]] = [match["scoreBlueFinal"]]
+                    else:
+                        scores[match["teams"][2]["teamNumber"]].append(match["scoreBlueFinal"])
                 continue
 
 print(scores)
