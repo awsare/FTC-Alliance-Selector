@@ -2,41 +2,46 @@ import requests as r
 import json as j
 import passwords
 
+import discord
+from discord.ext import commands
+
 USERNAME = passwords.USERNAME
 PASSWORD = passwords.PASSWORD
+TOKEN = passwords.TOKEN
 
-def main():
-    correct = False
-    while not correct:
-        TEAMNUM = input("Enter your team number: ")
+PREFIX = "f."
 
-        if len(TEAMNUM) > 5:
-            continue
-        if not TEAMNUM.isnumeric():
-            continue
+client = commands.Bot(command_prefix = commands.when_mentioned_or(f"{PREFIX}"))
+client.remove_command('help')
 
-        TEAMNUM = int(TEAMNUM)
-        break
+@client.event
+async def on_ready():
+    await client.change_presence(activity = discord.Activity(type = discord.ActivityType.listening, name = f"{PREFIX}help"))
+    print("Bot is online")
 
-    #correct = False
-    #while not correct:
-        #SEASON = input("Enter your season number: ")
+@client.command()
+async def stats(ctx, TEAMNUM, SEASON = None):
 
-        #if len(SEASON) != 4:
-            #continue
-        #if not SEASON.isnumeric():
-            #continue
+    if len(TEAMNUM) > 5:
+        pass
+    if not TEAMNUM.isnumeric():
+        pass
+    TEAMNUM = int(TEAMNUM)
+    
+    if SEASON == None:
+        SEASON = 2021
+    else:
+        if len(SEASON) != 4:
+            pass
+        if not SEASON.isnumeric():
+            pass
+        SEASON = int(SEASON)
 
-        #SEASON = int(SEASON)
-        #break
-    SEASON = 2021
-
-    events = r.get(f"https://ftc-api.firstinspires.org/v2.0/2021/events?teamNumber={TEAMNUM}", auth=(USERNAME, PASSWORD))
+    events = r.get(f"https://ftc-api.firstinspires.org/v2.0/{SEASON}/events?teamNumber={TEAMNUM}", auth=(USERNAME, PASSWORD))
     events = events.text
 
     if "Malformed Parameter Format In Request" in events:
-        print(f"Team {TEAMNUM} played no matches during the {SEASON} season.")
-        return
+        pass
 
     events = j.loads(events)
 
@@ -85,9 +90,9 @@ def main():
         average = round(total / len(score["Scores"]), 2)
         scores[team]["Average"] = average
         scores[team]["Highest"] = highest
-
+    
     print(j.dumps(scores, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    client.run(TOKEN)
