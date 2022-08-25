@@ -1,2 +1,3 @@
 # ftc-alliance-selector
-An FTC tool for finding your best alliance teams.
+
+A discord bot for finding your best FTC alliance teams.
