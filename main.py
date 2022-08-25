@@ -27,12 +27,10 @@ async def on_ready():
 async def stats(ctx, TEAMNUM, SEASON = None):
 
     if len(TEAMNUM) > 5:
-        embed = discord.Embed(title="Team Number Error", description="Team number must be five digits or less.", color=0xFFFFFF)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=errorEmbed(ctx, "Team Number Error", "Team number must be five digits or less."))
         return
     if not TEAMNUM.isnumeric():
-        embed = discord.Embed(title="Team Number Error", description="Team number must be numeric.", color=0xFFFFFF)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=errorEmbed(ctx, "Team Number Error", "Team number must be numeric."))
         return
     TEAMNUM = int(TEAMNUM)
     
@@ -40,25 +38,21 @@ async def stats(ctx, TEAMNUM, SEASON = None):
         SEASON = THIS_SEASON
     else:
         if len(SEASON) != 4:
-            embed = discord.Embed(title="Season Number Error", description="Season number must be four digits.", color=0xFFFFFF)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=errorEmbed(ctx, "Season Number Error", "Season number must be four digits."))
             return
         if not SEASON.isnumeric():
-            embed = discord.Embed(title="Season Number Error", description="Season number must be numeric.", color=0xFFFFFF)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=errorEmbed(ctx, "Season Number Error", "Season number must be numeric."))
             return
         SEASON = int(SEASON)
         if SEASON < 2019 or SEASON > THIS_SEASON:
-            embed = discord.Embed(title="Season Number Error", description=f"Season number must be between 2019 and {THIS_SEASON}", color=0xFFFFFF)
-            await ctx.send(embed=embed)
+            await ctx.send(embed=errorEmbed(ctx, "Season Number Error", f"Season number must be between 2019 and {THIS_SEASON}"))
             return
 
     events = r.get(f"https://ftc-api.firstinspires.org/v2.0/{SEASON}/events?teamNumber={TEAMNUM}", auth=(USERNAME, PASSWORD))
     events = events.text
 
     if "Malformed Parameter Format In Request" in events:
-        embed = discord.Embed(title=TEAMNUM, description=f"Team {TEAMNUM} has played no matches during the {SEASON} season.", color=0xFFFFFF)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=errorEmbed(ctx, TEAMNUM, f"Team {TEAMNUM} has played no matches during the {SEASON} season."))
         return
 
     events = j.loads(events)
@@ -110,6 +104,11 @@ async def stats(ctx, TEAMNUM, SEASON = None):
     
     print(j.dumps(scores, indent=2))
 
+
+def errorEmbed(ctx, title, desc):
+    embed = discord.Embed(title=title, description=desc, color=0xFFFFFF)
+    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+    return embed
 
 if __name__ == "__main__":
     client.run(TOKEN)
