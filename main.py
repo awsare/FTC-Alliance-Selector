@@ -1,5 +1,7 @@
 import requests as r
 import json as j
+from datetime import datetime
+from datetime import date
 import passwords
 
 import discord
@@ -11,8 +13,9 @@ TOKEN = passwords.TOKEN
 
 PREFIX = "f."
 
-client = commands.Bot(command_prefix = commands.when_mentioned_or(f"{PREFIX}"))
-client.remove_command('help')
+intents = discord.Intents.default()
+intents.message_content = True
+client = commands.Bot(command_prefix = commands.when_mentioned_or(f"{PREFIX}"), intents=intents)
 
 THIS_SEASON = r.get("http://ftc-api.firstinspires.org/v2.0")
 THIS_SEASON = j.loads(THIS_SEASON.text)
@@ -25,7 +28,9 @@ async def on_ready():
 
 @client.command()
 async def stats(ctx, TEAMNUM, SEASON = None):
-
+    if TEAMNUM == None:
+        await ctx.send(embed=errorEmbed(ctx, "Team Number Error", "Provide a team number."))
+        return
     if len(TEAMNUM) > 5:
         await ctx.send(embed=errorEmbed(ctx, "Team Number Error", "Team number must be five digits or less."))
         return
@@ -45,14 +50,14 @@ async def stats(ctx, TEAMNUM, SEASON = None):
             return
         SEASON = int(SEASON)
         if SEASON < 2019 or SEASON > THIS_SEASON:
-            await ctx.send(embed=errorEmbed(ctx, "Season Number Error", f"Season number must be between 2019 and {THIS_SEASON}"))
+            await ctx.send(embed=errorEmbed(ctx, "Season Number Error", f"Season number must be between 2019 and {THIS_SEASON}."))
             return
 
     events = r.get(f"https://ftc-api.firstinspires.org/v2.0/{SEASON}/events?teamNumber={TEAMNUM}", auth=(USERNAME, PASSWORD))
     events = events.text
 
     if "Malformed Parameter Format In Request" in events:
-        await ctx.send(embed=errorEmbed(ctx, TEAMNUM, f"Team {TEAMNUM} has played no matches during the {SEASON} season."))
+        await ctx.send(embed=errorEmbed(ctx, f"Team {TEAMNUM} ({SEASON}-{SEASON+1})", f"Team {TEAMNUM} has played no matches during the {SEASON} season."))
         return
 
     events = j.loads(events)
@@ -91,18 +96,62 @@ async def stats(ctx, TEAMNUM, SEASON = None):
                             scores[match["teams"][2]["teamNumber"]]["Scores"].append(match["scoreBlueFinal"])
                     continue
     
-    for team, score in scores.items():
+    averageThree = []
+    highestThree = []
+    for team, info in scores.items():
         total = 0
         highest = 0
-        for num in score["Scores"]:
+        for num in info["Scores"]:
             total += num
             if num > highest:
                 highest = num
-        average = round(total / len(score["Scores"]), 2)
+        average = round(total / len(info["Scores"]), 1)
         scores[team]["Average"] = average
         scores[team]["Highest"] = highest
+
+        if len(averageThree) < 3:
+            averageThree.append(team)
+        else:
+            if average > scores[averageThree[2]]["Average"]:
+                if average > scores[averageThree[1]]["Average"]:
+                    if average > scores[averageThree[0]]["Average"]:
+                        averageThree[0] = team
+                    else:
+                        averageThree[1] = team
+                else:
+                    averageThree[2] = team
+        
+        if len(highestThree) < 3:
+            highestThree.append(team)
+        else:
+            if highest > scores[highestThree[2]]["Highest"]:
+                if highest > scores[highestThree[1]]["Highest"]:
+                    if highest > scores[highestThree[0]]["Highest"]:
+                        highestThree[0] = team
+                    else:
+                        highestThree[1] = team
+                else:
+                    highestThree[2] = team
     
-    print(j.dumps(scores, indent=2))
+    #print(j.dumps(scores, indent=2))
+    #print(averageThree)
+    #print(highestThree)
+
+    embed = discord.Embed(title=f"Team {TEAMNUM} ({SEASON}-{SEASON+1})", color=0xFFFFFF)
+    #embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+    highscore1 = scores[highestThree[0]]["Highest"]
+    highscore2 = scores[highestThree[1]]["Highest"]
+    highscore3 = scores[highestThree[2]]["Highest"]
+    average1 = scores[averageThree[0]]["Average"]
+    average2 = scores[averageThree[1]]["Average"]
+    average3 = scores[averageThree[2]]["Average"]
+    embed.add_field(name="Best Alliances by High Score", value=f"{averageThree[0]}: {average1} points\n{averageThree[1]}: {average2} points\n{averageThree[2]}: {average3} points", inline=True)
+    embed.add_field(name="Best Alliances by Average Score", value=f"{highestThree[0]}: {highscore1} points\n{highestThree[1]}: {highscore2} points\n{highestThree[2]}: {highscore3} points", inline=True)
+
+    today = date.today().strftime("%B %d, %Y")
+    time = datetime.today().strftime("%I:%M %p")
+    embed.set_footer(text=f"{today} at {time}")
+    await ctx.send(embed=embed)
 
 
 def errorEmbed(ctx, title, desc):
