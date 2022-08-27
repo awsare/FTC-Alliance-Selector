@@ -57,7 +57,7 @@ async def stats(ctx, TEAMNUM, SEASON = None):
     events = events.text
 
     if "Malformed Parameter Format In Request" in events:
-        await ctx.send(embed=errorEmbed(ctx, f"Team {TEAMNUM} ({SEASON}-{SEASON+1})", f"Team {TEAMNUM} has played no matches during the {SEASON} season."))
+        await ctx.send(embed=errorEmbed(ctx, f"Team {TEAMNUM} ({SEASON}-{SEASON+1})", f"Team {TEAMNUM} played no matches during the {SEASON} season."))
         return
 
     events = j.loads(events)
@@ -109,6 +109,8 @@ async def stats(ctx, TEAMNUM, SEASON = None):
         scores[team]["Average"] = average
         scores[team]["Highest"] = highest
 
+        scores[team]["Name"] = getName(team, SEASON)
+        
         if len(averageThree) < 3:
             averageThree.append(team)
         else:
@@ -132,32 +134,44 @@ async def stats(ctx, TEAMNUM, SEASON = None):
                         highestThree[1] = team
                 else:
                     highestThree[2] = team
-    
-    #print(j.dumps(scores, indent=2))
-    #print(averageThree)
-    #print(highestThree)
 
-    embed = discord.Embed(title=f"Team {TEAMNUM} ({SEASON}-{SEASON+1})", color=0xFFFFFF)
-    #embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+    embed = discord.Embed(title=f"{TEAMNUM} {getName(TEAMNUM, SEASON)} ({SEASON}-{SEASON+1})", color=0xFFFFFF)
+    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
+
+    # why wont it let me put these directly into the fstring
     highscore1 = scores[highestThree[0]]["Highest"]
+    highscore1name = scores[highestThree[0]]["Name"]
     highscore2 = scores[highestThree[1]]["Highest"]
+    highscore2name = scores[highestThree[1]]["Name"]
     highscore3 = scores[highestThree[2]]["Highest"]
+    highscore3name = scores[highestThree[2]]["Name"]
     average1 = scores[averageThree[0]]["Average"]
+    average1name = scores[averageThree[0]]["Name"]
     average2 = scores[averageThree[1]]["Average"]
+    average2name = scores[averageThree[1]]["Name"]
     average3 = scores[averageThree[2]]["Average"]
-    embed.add_field(name="Best Alliances by High Score", value=f"{averageThree[0]}: {average1} points\n{averageThree[1]}: {average2} points\n{averageThree[2]}: {average3} points", inline=True)
-    embed.add_field(name="Best Alliances by Average Score", value=f"{highestThree[0]}: {highscore1} points\n{highestThree[1]}: {highscore2} points\n{highestThree[2]}: {highscore3} points", inline=True)
+    average3name = scores[averageThree[2]]["Name"]
+
+    embed.add_field(name="Best Alliances by Average Score", value=f"{averageThree[0]} {average1name}: {average1} points\n{averageThree[1]} {average2name}: {average2} points\n{averageThree[2]} {average3name}: {average3} points", inline=False)
+    embed.add_field(name="Best Alliances by High Score", value=f"{highestThree[0]} {highscore1name}: {highscore1} points\n{highestThree[1]} {highscore2name}: {highscore2} points\n{highestThree[2]} {highscore3name}: {highscore3} points", inline=False)
 
     today = date.today().strftime("%B %d, %Y")
     time = datetime.today().strftime("%I:%M %p")
     embed.set_footer(text=f"{today} at {time}")
+ 
     await ctx.send(embed=embed)
 
 
 def errorEmbed(ctx, title, desc):
     embed = discord.Embed(title=title, description=desc, color=0xFFFFFF)
-    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
     return embed
+
+def getName(num, season):
+    name = r.get(f"https://ftc-api.firstinspires.org/v2.0/{season}/teams?teamNumber={num}", auth=(USERNAME, PASSWORD))
+    name = j.loads(name.text)
+    name = name["teams"][0]["nameShort"]
+    return name
 
 if __name__ == "__main__":
     client.run(TOKEN)
