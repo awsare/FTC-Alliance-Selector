@@ -118,8 +118,11 @@ async def stats(ctx, TEAMNUM, SEASON = None):
                 if average > scores[averageThree[2]]["Average"]:
                     if average > scores[averageThree[1]]["Average"]:
                         if average > scores[averageThree[0]]["Average"]:
+                            averageThree[2] = averageThree[1]
+                            averageThree[1] = averageThree[0]
                             averageThree[0] = team
                         else:
+                            averageThree[2] = averageThree[1]
                             averageThree[1] = team
                     else:
                         averageThree[2] = team
@@ -130,8 +133,11 @@ async def stats(ctx, TEAMNUM, SEASON = None):
                 if highest > scores[highestThree[2]]["Highest"]:
                     if highest > scores[highestThree[1]]["Highest"]:
                         if highest > scores[highestThree[0]]["Highest"]:
+                            highestThree[2] = highestThree[1]
+                            highestThree[1] = highestThree[0]
                             highestThree[0] = team
                         else:
+                            highestThree[2] = highestThree[1]
                             highestThree[1] = team
                     else:
                         highestThree[2] = team
