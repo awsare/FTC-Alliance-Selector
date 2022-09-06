@@ -95,7 +95,7 @@ async def stats(ctx, TEAMNUM, SEASON = None):
                                 scores[match["teams"][2]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]]}
                             else:
                                 scores[match["teams"][2]["teamNumber"]]["Scores"].append(match["scoreBlueFinal"])
-                        continue
+                        break
         
         averageThree = []
         highestThree = []
