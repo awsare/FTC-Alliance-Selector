@@ -10,7 +10,6 @@ from discord.ext import commands
 USERNAME = passwords.USERNAME
 PASSWORD = passwords.PASSWORD
 TOKEN = passwords.TOKEN
-
 PREFIX = "f."
 
 intents = discord.Intents.default()
@@ -75,30 +74,38 @@ async def stats(ctx, TEAMNUM, SEASON = None):
             for match in matches["matches"]:
                 for team in match["teams"]:
                     if team["teamNumber"] == TEAMNUM:
+                        if match["scoreRedFinal"] != match["scoreBlueFinal"]:
+                            redwl = match["scoreRedFinal"] > match["scoreBlueFinal"]
+                            bluewl = match["scoreRedFinal"] < match["scoreBlueFinal"]
                         if team["station"] == "Red1":
                             if match["teams"][1]["teamNumber"] not in scores:
-                                scores[match["teams"][1]["teamNumber"]] = {"Scores":[match["scoreRedFinal"]]}
+                                scores[match["teams"][1]["teamNumber"]] = {"Scores":[match["scoreRedFinal"]], "WL":[redwl]}
                             else:
                                 scores[match["teams"][1]["teamNumber"]]["Scores"].append(match["scoreRedFinal"])
+                                scores[match["teams"][1]["teamNumber"]]["WL"].append(redwl)
                         elif team["station"] == "Red2":
                             if match["teams"][0]["teamNumber"] not in scores:
-                                scores[match["teams"][0]["teamNumber"]] = {"Scores":[match["scoreRedFinal"]]}
+                                scores[match["teams"][0]["teamNumber"]] = {"Scores":[match["scoreRedFinal"]], "WL":[redwl]}
                             else:
                                 scores[match["teams"][0]["teamNumber"]]["Scores"].append(match["scoreRedFinal"])
+                                scores[match["teams"][0]["teamNumber"]]["WL"].append(redwl)
                         elif team["station"] == "Blue1":
                             if match["teams"][3]["teamNumber"] not in scores:
-                                scores[match["teams"][3]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]]}
+                                scores[match["teams"][3]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]], "WL":[bluewl]}
                             else:
                                 scores[match["teams"][3]["teamNumber"]]["Scores"].append(match["scoreBlueFinal"])
+                                scores[match["teams"][3]["teamNumber"]]["WL"].append(bluewl)
                         elif team["station"] == "Blue2":
                             if match["teams"][2]["teamNumber"] not in scores:
-                                scores[match["teams"][2]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]]}
+                                scores[match["teams"][2]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]], "WL":[bluewl]}
                             else:
                                 scores[match["teams"][2]["teamNumber"]]["Scores"].append(match["scoreBlueFinal"])
+                                scores[match["teams"][2]["teamNumber"]]["WL"].append(bluewl)
                         break
         
         averageThree = []
         highestThree = []
+        wlThree = []
         for team, info in scores.items():
             total = 0
             highest = 0
@@ -109,6 +116,14 @@ async def stats(ctx, TEAMNUM, SEASON = None):
             average = round(total / len(info["Scores"]), 1)
             scores[team]["Average"] = average
             scores[team]["Highest"] = highest
+
+            totalW = 0
+            for wl in info["WL"]:
+                if wl == True:
+                    totalW += 1
+
+            wlpercent = round(totalW/len(info["WL"]), 2)
+            scores[team]["WL Percent"] = wlpercent
 
             scores[team]["Name"] = getName(team, SEASON)
             
