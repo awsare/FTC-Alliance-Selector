@@ -128,7 +128,24 @@ async def stats(ctx, TEAMNUM, SEASON = None):
             scores[team]["Name"] = getName(team, SEASON)
             
             if len(averageThree) < 3:
-                averageThree.append(team)
+                if len(averageThree) == 0:
+                    averageThree.append(team)
+                elif len(averageThree) == 1:
+                    if average > scores[averageThree[0]]["Average"]:
+                        averageThree.append(averageThree[0])
+                        averageThree[0] = team
+                    else:
+                        averageThree.append(team)
+                else:
+                    if average > scores[averageThree[0]]["Average"]:
+                        averageThree.append(averageThree[1])
+                        averageThree[1] = averageThree[0]
+                        averageThree[0] = team
+                    elif average > scores[averageThree[1]]["Average"]:
+                        averageThree.append(averageThree[1])
+                        averageThree[1] = team
+                    else:
+                        averageThree.append(team)
             else:
                 if average > scores[averageThree[2]]["Average"]:
                     if average > scores[averageThree[1]]["Average"]:
@@ -143,7 +160,24 @@ async def stats(ctx, TEAMNUM, SEASON = None):
                         averageThree[2] = team
             
             if len(highestThree) < 3:
-                highestThree.append(team)
+                if len(highestThree) == 0:
+                    highestThree.append(team)
+                elif len(highestThree) == 1:
+                    if highest > scores[highestThree[0]]["Highest"]:
+                        highestThree.append(highestThree[0])
+                        highestThree[0] = team
+                    else:
+                        highestThree.append(team)
+                else:
+                    if highest > scores[highestThree[0]]["Highest"]:
+                        highestThree.append(highestThree[1])
+                        highestThree[1] = highestThree[0]
+                        highestThree[0] = team
+                    elif highest > scores[highestThree[1]]["Highest"]:
+                        highestThree.append(highestThree[1])
+                        highestThree[1] = team
+                    else:
+                        highestThree.append(team)
             else:
                 if highest > scores[highestThree[2]]["Highest"]:
                     if highest > scores[highestThree[1]]["Highest"]:
