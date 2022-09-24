@@ -122,7 +122,7 @@ async def stats(ctx, TEAMNUM, SEASON = None):
                 if wl == True:
                     totalW += 1
 
-            wlpercent = round(totalW/len(info["WL"]), 2)
+            wlpercent = round(totalW/len(info["WL"]), 2) * 100
             scores[team]["WL Percent"] = wlpercent
 
             scores[team]["Name"] = getName(team, SEASON)
@@ -190,6 +190,40 @@ async def stats(ctx, TEAMNUM, SEASON = None):
                             highestThree[1] = team
                     else:
                         highestThree[2] = team
+        
+            if len(wlThree) < 3:
+                if len(wlThree) == 0:
+                    wlThree.append(team)
+                elif len(wlThree) == 1:
+                    if wlpercent > scores[wlThree[0]]["WL Percent"]:
+                        wlThree.append(wlThree[0])
+                        wlThree[0] = team
+                    else:
+                        wlThree.append(team)
+                else:
+                    if wlpercent > scores[wlThree[0]]["WL Percent"]:
+                        wlThree.append(wlThree[1])
+                        wlThree[1] = wlThree[0]
+                        wlThree[0] = team
+                    elif wlpercent > scores[wlThree[1]]["WL Percent"]:
+                        wlThree.append(wlThree[1])
+                        wlThree[1] = team
+                    else:
+                        wlThree.append(team)
+            else:
+                if wlpercent > scores[wlThree[2]]["WL Percent"]:
+                    if wlpercent > scores[wlThree[1]]["WL Percent"]:
+                        if wlpercent > scores[wlThree[0]]["WL Percent"]:
+                            wlThree[2] = wlThree[1]
+                            wlThree[1] = wlThree[0]
+                            wlThree[0] = team
+                        else:
+                            wlThree[2] = wlThree[1]
+                            wlThree[1] = team
+                    else:
+                        wlThree[2] = team
+        
+        print(j.dumps(scores, indent=2))
 
         embed = discord.Embed(title=f"{TEAMNUM} {getName(TEAMNUM, SEASON)} ({SEASON}-{SEASON+1})", color=0xFFFFFF)
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
@@ -207,9 +241,16 @@ async def stats(ctx, TEAMNUM, SEASON = None):
         average2name = scores[averageThree[1]]["Name"]
         average3 = scores[averageThree[2]]["Average"]
         average3name = scores[averageThree[2]]["Name"]
+        wl1 = scores[wlThree[0]]["WL Percent"]
+        wl1name = scores[wlThree[0]]["Name"]
+        wl2 = scores[wlThree[1]]["WL Percent"]
+        wl2name = scores[wlThree[1]]["Name"]
+        wl3 = scores[wlThree[2]]["WL Percent"]
+        wl3name = scores[wlThree[2]]["Name"]
 
         embed.add_field(name="Best Alliances by Average Score", value=f"{averageThree[0]} {average1name}: {average1} points\n{averageThree[1]} {average2name}: {average2} points\n{averageThree[2]} {average3name}: {average3} points", inline=False)
         embed.add_field(name="Best Alliances by High Score", value=f"{highestThree[0]} {highscore1name}: {highscore1} points\n{highestThree[1]} {highscore2name}: {highscore2} points\n{highestThree[2]} {highscore3name}: {highscore3} points", inline=False)
+        embed.add_field(name="Best Alliances by Win Rate", value=f"{wlThree[0]} {wl1name}: {wl1}%\n{wlThree[1]} {wl2name}: {wl2}%\n{wlThree[2]} {wl3name}: {wl3}%", inline=False)
 
         today = date.today().strftime("%B %d, %Y")
         time = datetime.today().strftime("%I:%M %p")
