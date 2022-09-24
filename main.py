@@ -103,161 +103,53 @@ async def stats(ctx, TEAMNUM, SEASON = None):
                                 scores[match["teams"][2]["teamNumber"]]["WL"].append(bluewl)
                         break
         
-        averageThree = []
-        highestThree = []
-        wlThree = []
+        teamsList = []
+        for team in scores:
+            teamsList.append(team)
+
         for team, info in scores.items():
-            total = 0
+            totalScore = 0
             highest = 0
+            totalW = 0
+
             for num in info["Scores"]:
-                total += num
+                totalScore += num
                 if num > highest:
                     highest = num
-            average = round(total / len(info["Scores"]), 1)
-            scores[team]["Average"] = average
-            scores[team]["Highest"] = highest
 
-            totalW = 0
             for wl in info["WL"]:
                 if wl == True:
                     totalW += 1
 
+            average = round(totalScore / len(info["Scores"]), 1)
             wlpercent = round(totalW/len(info["WL"]), 2) * 100
-            scores[team]["WL Percent"] = wlpercent
+            scores[team]["Average"] = average
+            scores[team]["Highest"] = highest
+            scores[team]["Win Rate"] = wlpercent
 
             scores[team]["Name"] = getName(team, SEASON)
-            
-            if len(averageThree) < 3:
-                if len(averageThree) == 0:
-                    averageThree.append(team)
-                elif len(averageThree) == 1:
-                    if average > scores[averageThree[0]]["Average"]:
-                        averageThree.append(averageThree[0])
-                        averageThree[0] = team
-                    else:
-                        averageThree.append(team)
-                else:
-                    if average > scores[averageThree[0]]["Average"]:
-                        averageThree.append(averageThree[1])
-                        averageThree[1] = averageThree[0]
-                        averageThree[0] = team
-                    elif average > scores[averageThree[1]]["Average"]:
-                        averageThree.append(averageThree[1])
-                        averageThree[1] = team
-                    else:
-                        averageThree.append(team)
-            else:
-                if average > scores[averageThree[2]]["Average"]:
-                    if average > scores[averageThree[1]]["Average"]:
-                        if average > scores[averageThree[0]]["Average"]:
-                            averageThree[2] = averageThree[1]
-                            averageThree[1] = averageThree[0]
-                            averageThree[0] = team
-                        else:
-                            averageThree[2] = averageThree[1]
-                            averageThree[1] = team
-                    else:
-                        averageThree[2] = team
-            
-            if len(highestThree) < 3:
-                if len(highestThree) == 0:
-                    highestThree.append(team)
-                elif len(highestThree) == 1:
-                    if highest > scores[highestThree[0]]["Highest"]:
-                        highestThree.append(highestThree[0])
-                        highestThree[0] = team
-                    else:
-                        highestThree.append(team)
-                else:
-                    if highest > scores[highestThree[0]]["Highest"]:
-                        highestThree.append(highestThree[1])
-                        highestThree[1] = highestThree[0]
-                        highestThree[0] = team
-                    elif highest > scores[highestThree[1]]["Highest"]:
-                        highestThree.append(highestThree[1])
-                        highestThree[1] = team
-                    else:
-                        highestThree.append(team)
-            else:
-                if highest > scores[highestThree[2]]["Highest"]:
-                    if highest > scores[highestThree[1]]["Highest"]:
-                        if highest > scores[highestThree[0]]["Highest"]:
-                            highestThree[2] = highestThree[1]
-                            highestThree[1] = highestThree[0]
-                            highestThree[0] = team
-                        else:
-                            highestThree[2] = highestThree[1]
-                            highestThree[1] = team
-                    else:
-                        highestThree[2] = team
         
-            if len(wlThree) < 3:
-                if len(wlThree) == 0:
-                    wlThree.append(team)
-                elif len(wlThree) == 1:
-                    if wlpercent > scores[wlThree[0]]["WL Percent"]:
-                        wlThree.append(wlThree[0])
-                        wlThree[0] = team
-                    else:
-                        wlThree.append(team)
-                else:
-                    if wlpercent > scores[wlThree[0]]["WL Percent"]:
-                        wlThree.append(wlThree[1])
-                        wlThree[1] = wlThree[0]
-                        wlThree[0] = team
-                    elif wlpercent > scores[wlThree[1]]["WL Percent"]:
-                        wlThree.append(wlThree[1])
-                        wlThree[1] = team
-                    else:
-                        wlThree.append(team)
-            else:
-                if wlpercent > scores[wlThree[2]]["WL Percent"]:
-                    if wlpercent > scores[wlThree[1]]["WL Percent"]:
-                        if wlpercent > scores[wlThree[0]]["WL Percent"]:
-                            wlThree[2] = wlThree[1]
-                            wlThree[1] = wlThree[0]
-                            wlThree[0] = team
-                        else:
-                            wlThree[2] = wlThree[1]
-                            wlThree[1] = team
-                    else:
-                        wlThree[2] = team
-        
-        print(j.dumps(scores, indent=2))
+        averageList = teamsList.copy()
+        averageList.sort(key=lambda x: scores[x]["Average"], reverse=True)
+
+        highestList = teamsList.copy()
+        highestList.sort(key=lambda x: scores[x]["Highest"], reverse=True)
+
+        winrateList = teamsList.copy()
+        winrateList.sort(key=lambda x: scores[x]["Win Rate"], reverse=True)
 
         embed = discord.Embed(title=f"{TEAMNUM} {getName(TEAMNUM, SEASON)} ({SEASON}-{SEASON+1})", color=0xFFFFFF)
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
 
-        # why wont it let me put these directly into the fstring
-        highscore1 = scores[highestThree[0]]["Highest"]
-        highscore1name = scores[highestThree[0]]["Name"]
-        highscore2 = scores[highestThree[1]]["Highest"]
-        highscore2name = scores[highestThree[1]]["Name"]
-        highscore3 = scores[highestThree[2]]["Highest"]
-        highscore3name = scores[highestThree[2]]["Name"]
-        average1 = scores[averageThree[0]]["Average"]
-        average1name = scores[averageThree[0]]["Name"]
-        average2 = scores[averageThree[1]]["Average"]
-        average2name = scores[averageThree[1]]["Name"]
-        average3 = scores[averageThree[2]]["Average"]
-        average3name = scores[averageThree[2]]["Name"]
-        wl1 = scores[wlThree[0]]["WL Percent"]
-        wl1name = scores[wlThree[0]]["Name"]
-        wl2 = scores[wlThree[1]]["WL Percent"]
-        wl2name = scores[wlThree[1]]["Name"]
-        wl3 = scores[wlThree[2]]["WL Percent"]
-        wl3name = scores[wlThree[2]]["Name"]
-
-        embed.add_field(name="Best Alliances by Average Score", value=f"{averageThree[0]} {average1name}: {average1} points\n{averageThree[1]} {average2name}: {average2} points\n{averageThree[2]} {average3name}: {average3} points", inline=False)
-        embed.add_field(name="Best Alliances by High Score", value=f"{highestThree[0]} {highscore1name}: {highscore1} points\n{highestThree[1]} {highscore2name}: {highscore2} points\n{highestThree[2]} {highscore3name}: {highscore3} points", inline=False)
-        embed.add_field(name="Best Alliances by Win Rate", value=f"{wlThree[0]} {wl1name}: {wl1}%\n{wlThree[1]} {wl2name}: {wl2}%\n{wlThree[2]} {wl3name}: {wl3}%", inline=False)
-
+        embed.add_field(name="Best Alliances by Average Score", value=f"{averageList[0]} {scores[averageList[0]]['Name']}: {scores[averageList[0]]['Average']} points\n{averageList[1]} {scores[averageList[1]]['Name']}: {scores[averageList[1]]['Average']} points\n{averageList[2]} {scores[averageList[2]]['Name']}: {scores[averageList[2]]['Average']} points\n{averageList[3]} {scores[averageList[3]]['Name']}: {scores[averageList[3]]['Average']} points\n{averageList[4]} {scores[averageList[4]]['Name']}: {scores[averageList[4]]['Average']} points", inline=False)
+        embed.add_field(name="Best Alliances by High Score", value=f"{highestList[0]} {scores[highestList[0]]['Name']}: {scores[highestList[0]]['Highest']} points\n{highestList[1]} {scores[highestList[1]]['Name']}: {scores[highestList[1]]['Highest']} points\n{highestList[2]} {scores[highestList[2]]['Name']}: {scores[highestList[2]]['Highest']} points\n{highestList[3]} {scores[highestList[3]]['Name']}: {scores[highestList[3]]['Highest']} points\n{highestList[4]} {scores[highestList[4]]['Name']}: {scores[highestList[4]]['Highest']} points", inline=False)
+        embed.add_field(name="Best Alliances by Win Rate", value=f"{winrateList[0]} {scores[winrateList[0]]['Name']}: {scores[winrateList[0]]['Win Rate']}%\n{winrateList[1]} {scores[winrateList[1]]['Name']}: {scores[winrateList[1]]['Win Rate']}%\n{winrateList[2]} {scores[winrateList[2]]['Name']}: {scores[winrateList[2]]['Win Rate']}%\n{winrateList[3]} {scores[winrateList[3]]['Name']}: {scores[winrateList[3]]['Win Rate']}%\n{winrateList[4]} {scores[winrateList[4]]['Name']}: {scores[winrateList[4]]['Win Rate']}%", inline=False)
+        
         today = date.today().strftime("%B %d, %Y")
         time = datetime.today().strftime("%I:%M %p")
         embed.set_footer(text=f"{today} at {time}")
  
     await ctx.send(embed=embed)
-
 
 def errorEmbed(ctx, title, desc):
     embed = discord.Embed(title=title, description=desc, color=0xFFFFFF)
