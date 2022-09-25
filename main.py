@@ -20,26 +20,6 @@ THIS_SEASON = r.get("http://ftc-api.firstinspires.org/v2.0")
 THIS_SEASON = j.loads(THIS_SEASON.text)
 THIS_SEASON = THIS_SEASON["currentSeason"]
 
-
-
-
-
-from flask import *
-
-app = Flask(__name__)
-
-@app.route('/home/')
-def home():
-	return "Hi"
-
-if __name__ == '__main__':
-	app.run(debug=False,host='0.0.0.0',port=5000)
-
-
-
-
-
-
 @client.event
 async def on_ready():
     await client.change_presence(activity = discord.Activity(type = discord.ActivityType.listening, name = f"{PREFIX}help"))
