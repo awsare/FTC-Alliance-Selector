@@ -15,6 +15,7 @@ PREFIX = "f."
 intents = discord.Intents.default()
 intents.message_content = True
 client = commands.Bot(command_prefix = commands.when_mentioned_or(f"{PREFIX}"), intents=intents)
+client.remove_command('help')
 
 THIS_SEASON = r.get("http://ftc-api.firstinspires.org/v2.0")
 THIS_SEASON = j.loads(THIS_SEASON.text)
