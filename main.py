@@ -141,9 +141,29 @@ async def stats(ctx, TEAMNUM, SEASON = None):
         embed = discord.Embed(title=f"{TEAMNUM} {getName(TEAMNUM, SEASON)} ({SEASON}-{SEASON+1})", color=0xFFFFFF)
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
 
-        embed.add_field(name="Best Alliances by Average Score", value=f"{averageList[0]} {scores[averageList[0]]['Name']}: {scores[averageList[0]]['Average']} points\n{averageList[1]} {scores[averageList[1]]['Name']}: {scores[averageList[1]]['Average']} points\n{averageList[2]} {scores[averageList[2]]['Name']}: {scores[averageList[2]]['Average']} points\n{averageList[3]} {scores[averageList[3]]['Name']}: {scores[averageList[3]]['Average']} points\n{averageList[4]} {scores[averageList[4]]['Name']}: {scores[averageList[4]]['Average']} points", inline=False)
-        embed.add_field(name="Best Alliances by High Score", value=f"{highestList[0]} {scores[highestList[0]]['Name']}: {scores[highestList[0]]['Highest']} points\n{highestList[1]} {scores[highestList[1]]['Name']}: {scores[highestList[1]]['Highest']} points\n{highestList[2]} {scores[highestList[2]]['Name']}: {scores[highestList[2]]['Highest']} points\n{highestList[3]} {scores[highestList[3]]['Name']}: {scores[highestList[3]]['Highest']} points\n{highestList[4]} {scores[highestList[4]]['Name']}: {scores[highestList[4]]['Highest']} points", inline=False)
-        embed.add_field(name="Best Alliances by Win Rate", value=f"{winrateList[0]} {scores[winrateList[0]]['Name']}: {scores[winrateList[0]]['Win Rate']}%\n{winrateList[1]} {scores[winrateList[1]]['Name']}: {scores[winrateList[1]]['Win Rate']}%\n{winrateList[2]} {scores[winrateList[2]]['Name']}: {scores[winrateList[2]]['Win Rate']}%\n{winrateList[3]} {scores[winrateList[3]]['Name']}: {scores[winrateList[3]]['Win Rate']}%\n{winrateList[4]} {scores[winrateList[4]]['Name']}: {scores[winrateList[4]]['Win Rate']}%", inline=False)
+        print(j.dumps(scores, indent=1))
+
+        averageField = ""
+        for index, team in enumerate(averageList):
+            if index > 4:
+                break
+            averageField += f"{averageList[index]} {scores[averageList[index]]['Name']}: {scores[averageList[index]]['Average']} points\n"
+        
+        highestField = ""
+        for index, team in enumerate(highestList):
+            if index > 4:
+                break
+            highestField += f"{highestList[index]} {scores[highestList[index]]['Name']}: {scores[highestList[index]]['Highest']} points\n"
+        
+        winrateField = ""
+        for index, team in enumerate(winrateList):
+            if index > 4:
+                break
+            winrateField += f"{winrateList[index]} {scores[winrateList[index]]['Name']}: {scores[winrateList[index]]['Win Rate']}%\n"
+
+        embed.add_field(name="Best Alliances by Average Score", value=averageField, inline=False)
+        embed.add_field(name="Best Alliances by High Score", value=highestField, inline=False)
+        embed.add_field(name="Best Alliances by Win Rate", value=winrateField, inline=False)
         
         today = date.today().strftime("%B %d, %Y")
         time = datetime.today().strftime("%I:%M %p")
