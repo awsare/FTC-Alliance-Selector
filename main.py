@@ -112,6 +112,7 @@ async def stats(ctx, TEAMNUM, SEASON = None):
             totalScore = 0
             highest = 0
             totalW = 0
+            totalMatches = len(info["WL"])
 
             for num in info["Scores"]:
                 totalScore += num
@@ -127,7 +128,7 @@ async def stats(ctx, TEAMNUM, SEASON = None):
             scores[team]["Average"] = average
             scores[team]["Highest"] = highest
             scores[team]["Win Rate"] = wlpercent
-
+            scores[team]["Matches Played"] = totalMatches
             scores[team]["Name"] = getName(team, SEASON)
         
         averageList = teamsList.copy()
@@ -148,19 +149,19 @@ async def stats(ctx, TEAMNUM, SEASON = None):
         for index, team in enumerate(averageList):
             if index > 4:
                 break
-            averageField += f"{averageList[index]} {scores[averageList[index]]['Name']}: {scores[averageList[index]]['Average']} points\n"
+            averageField += f"{averageList[index]} {scores[averageList[index]]['Name']}: {scores[averageList[index]]['Average']} points ({scores[averageList[index]]['Matches Played']})\n"
         
         highestField = ""
         for index, team in enumerate(highestList):
             if index > 4:
                 break
-            highestField += f"{highestList[index]} {scores[highestList[index]]['Name']}: {scores[highestList[index]]['Highest']} points\n"
+            highestField += f"{highestList[index]} {scores[highestList[index]]['Name']}: {scores[highestList[index]]['Highest']} points ({scores[averageList[index]]['Matches Played']})\n"
         
         winrateField = ""
         for index, team in enumerate(winrateList):
             if index > 4:
                 break
-            winrateField += f"{winrateList[index]} {scores[winrateList[index]]['Name']}: {scores[winrateList[index]]['Win Rate']}%\n"
+            winrateField += f"{winrateList[index]} {scores[winrateList[index]]['Name']}: {scores[winrateList[index]]['Win Rate']}% ({scores[averageList[index]]['Matches Played']})\n"
 
         embed.add_field(name="Best Alliances by Average Score", value=averageField, inline=False)
         embed.add_field(name="Best Alliances by High Score", value=highestField, inline=False)
