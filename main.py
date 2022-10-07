@@ -132,13 +132,13 @@ async def stats(ctx, TEAMNUM, SEASON = None):
             scores[team]["Name"] = getName(team, SEASON)
         
         averageList = teamsList.copy()
-        averageList.sort(key=lambda x: scores[x]["Average"], reverse=True)
+        averageList.sort(key=lambda x: (scores[x]["Average"], scores[x]["Matches Played"]), reverse=True)
 
         highestList = teamsList.copy()
-        highestList.sort(key=lambda x: scores[x]["Highest"], reverse=True)
+        highestList.sort(key=lambda x: (scores[x]["Highest"], scores[x]["Matches Played"]), reverse=True)
 
         winrateList = teamsList.copy()
-        winrateList.sort(key=lambda x: scores[x]["Win Rate"], reverse=True)
+        winrateList.sort(key=lambda x: (scores[x]["Win Rate"], scores[x]["Matches Played"]), reverse=True)
 
         embed = discord.Embed(title=f"{TEAMNUM} {getName(TEAMNUM, SEASON)} ({SEASON}-{SEASON+1})", color=0xFFFFFF)
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
