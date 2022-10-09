@@ -63,6 +63,10 @@ async def stats(ctx, TEAMNUM, SEASON = None):
 
         events = j.loads(events)
 
+        if events["eventCount"] == 0:
+            await ctx.send(embed=errorEmbed(ctx, f"Team {TEAMNUM} ({SEASON}-{SEASON+1})", f"Team {TEAMNUM} played no matches during the {SEASON} season."))
+            return
+
         codes = []
         for event in events["events"]:
             codes.append(event["code"])
@@ -143,7 +147,7 @@ async def stats(ctx, TEAMNUM, SEASON = None):
         embed = discord.Embed(title=f"{TEAMNUM} {getName(TEAMNUM, SEASON)} ({SEASON}-{SEASON+1})", color=0xFFFFFF)
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
 
-        print(j.dumps(scores, indent=1))
+        #print(j.dumps(scores, indent=1))
 
         averageField = ""
         for index, team in enumerate(averageList):
@@ -155,13 +159,13 @@ async def stats(ctx, TEAMNUM, SEASON = None):
         for index, team in enumerate(highestList):
             if index > 4:
                 break
-            highestField += f"{highestList[index]} {scores[highestList[index]]['Name']}: {scores[highestList[index]]['Highest']} points ({scores[averageList[index]]['Matches Played']})\n"
+            highestField += f"{highestList[index]} {scores[highestList[index]]['Name']}: {scores[highestList[index]]['Highest']} points ({scores[highestList[index]]['Matches Played']})\n"
         
         winrateField = ""
         for index, team in enumerate(winrateList):
             if index > 4:
                 break
-            winrateField += f"{winrateList[index]} {scores[winrateList[index]]['Name']}: {scores[winrateList[index]]['Win Rate']}% ({scores[averageList[index]]['Matches Played']})\n"
+            winrateField += f"{winrateList[index]} {scores[winrateList[index]]['Name']}: {scores[winrateList[index]]['Win Rate']}% ({scores[winrateList[index]]['Matches Played']})\n"
 
         embed.add_field(name="Best Alliances by Average Score", value=averageField, inline=False)
         embed.add_field(name="Best Alliances by High Score", value=highestField, inline=False)
