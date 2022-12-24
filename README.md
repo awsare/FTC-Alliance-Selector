@@ -1,4 +1,4 @@
-FTC-Alliance-Selector
+# FTC-Alliance-Selector
 
 **A discord bot for finding your best FTC alliance teams.**
 
