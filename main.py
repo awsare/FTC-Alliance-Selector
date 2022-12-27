@@ -14,7 +14,7 @@ PASSWORD = passwords.PASSWORD
 TOKEN = passwords.TOKEN
 PREFIX = "f."
 
-ALLIANCE_COUNT = 8
+ALLIANCE_COUNT = 4
 
 intents = disnake.Intents.default()
 intents.message_content = True
