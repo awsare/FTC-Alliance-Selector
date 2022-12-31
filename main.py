@@ -81,6 +81,7 @@ async def alliances(ctx, team_num, season_num = None):
     scores = {}
     for event in codes:
         matches = r.get(f"http://ftc-api.firstinspires.org/v2.0/{season_num}/matches/{event}", auth=(USERNAME, PASSWORD))
+        print(matches.text)
         matches = j.loads(matches.text)
 
         for match in matches["matches"]:
