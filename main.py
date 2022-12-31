@@ -76,7 +76,8 @@ async def alliances(ctx, team_num, season_num = None):
 
     codes = []
     for event in events["events"]:
-        codes.append(event["code"])
+        if (event["published"] == True):
+            codes.append(event["code"])
 
     scores = {}
     for event in codes:
