@@ -6,6 +6,7 @@ import pytz
 
 import passwords
 
+
 import disnake
 from disnake.ext import commands
 
@@ -45,6 +46,9 @@ async def alliances(ctx, team_num, season_num = None):
         await ctx.send(embed=errorEmbed(ctx, "Team Number Error", "Team number must be numeric."))
         return
     team_num = int(team_num)
+    if team_num < 1 or team_num > 99999:
+        await ctx.send(embed=errorEmbed(ctx, "Team Number Error", "Team number must be between 1 and 99999."))
+        return
     
     if season_num == None:
         season_num = THIS_SEASON
@@ -75,7 +79,8 @@ async def alliances(ctx, team_num, season_num = None):
 
     codes = []
     for event in events["events"]:
-        codes.append(event["code"])
+        if (event["published"] == True):
+            codes.append(event["code"])
 
     scores = {}
     for event in codes:
@@ -186,7 +191,11 @@ async def alliances(ctx, team_num, season_num = None):
 
 def errorEmbed(ctx, title, desc):
     embed = disnake.Embed(title=title, description=desc, color=0xFFFFFF)
-    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
+    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)\
+    
+    today = date.today().strftime("%B %d, %Y")
+    time = datetime.now(pytz.timezone("US/Eastern")).strftime("%I:%M %p")
+    embed.set_footer(text=f"{today} at {time} EST")
     return embed
 
 def getName(num, season):
