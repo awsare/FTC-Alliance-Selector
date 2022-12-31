@@ -187,7 +187,11 @@ async def alliances(ctx, team_num, season_num = None):
 
 def errorEmbed(ctx, title, desc):
     embed = disnake.Embed(title=title, description=desc, color=0xFFFFFF)
-    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
+    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)\
+    
+    today = date.today().strftime("%B %d, %Y")
+    time = datetime.now(pytz.timezone("US/Eastern")).strftime("%I:%M %p")
+    embed.set_footer(text=f"{today} at {time} EST")
     return embed
 
 def getName(num, season):
