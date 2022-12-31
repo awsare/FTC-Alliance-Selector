@@ -120,6 +120,7 @@ async def alliances(ctx, team_num, season_num = None):
     teamsList = []
     for team in scores:
         teamsList.append(team)
+        print(team)
 
     for team, info in scores.items():
         totalScore = 0
