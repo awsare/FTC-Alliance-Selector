@@ -15,7 +15,7 @@ PASSWORD = passwords.PASSWORD
 TOKEN = passwords.TOKEN
 PREFIX = "f."
 
-ALLIANCE_COUNT = 6
+ROW_COUNT = 6
 
 intents = disnake.Intents.default()
 intents.message_content = True
@@ -162,19 +162,19 @@ async def alliances(ctx, team_num, season_num = None):
 
     averageField = ""
     for index, team in enumerate(averageList):
-        if index > ALLIANCE_COUNT - 1:
+        if index > ROW_COUNT - 1:
             break
         averageField += f"{averageList[index]} {scores[averageList[index]]['Name']}: {scores[averageList[index]]['Average']} points ({scores[averageList[index]]['Matches Played']})\n"
     
     highestField = ""
     for index, team in enumerate(highestList):
-        if index > ALLIANCE_COUNT - 1:
+        if index > ROW_COUNT - 1:
             break
         highestField += f"{highestList[index]} {scores[highestList[index]]['Name']}: {scores[highestList[index]]['Highest']} points ({scores[highestList[index]]['Matches Played']})\n"
     
     winrateField = ""
     for index, team in enumerate(winrateList):
-        if index > ALLIANCE_COUNT - 1:
+        if index > ROW_COUNT - 1:
             break
         winrateField += f"{winrateList[index]} {scores[winrateList[index]]['Name']}: {scores[winrateList[index]]['Win Rate']}% ({scores[winrateList[index]]['Matches Played']})\n"
 
@@ -281,12 +281,30 @@ async def stats(ctx, team_num, season_num = None):
     embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
 
     totalScore = 0
+    highestScores = []
     for score in scores[team_num]["Scores"]:
+        highestScores.append(score)
         totalScore += score
 
+    totalW = 0
+    for wl in scores[team_num]["WL"]:
+        if (wl == True):
+            totalW += 1
+
+    highestScores.sort(reverse=True)
+
+    highestField = ""
+    for index, score in enumerate(highestScores):
+        if index > ROW_COUNT - 1:
+            break
+        highestField += f"{score}\n"
+
     average = round(totalScore / len(scores[team_num]["Scores"]), 1)
+    wlpercent = round(totalW/len(scores[team_num]["WL"]), 2) * 100
     
     embed.add_field(name="Average Score", value=average, inline=False)
+    embed.add_field(name="Highest Scores", value=highestField, inline=False)
+    embed.add_field(name="Win Rate", value=wlpercent, inline=False)
     
     today = date.today().strftime("%B %d, %Y")
     time = datetime.now(pytz.timezone("US/Eastern")).strftime("%I:%M %p")
