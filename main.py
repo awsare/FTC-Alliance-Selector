@@ -279,6 +279,14 @@ async def stats(ctx, team_num, season_num = None):
 
     embed = disnake.Embed(title=f"{team_num} {getName(team_num, season_num)} ({season_num}-{season_num+1})", color=0xFFFFFF)
     embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
+
+    totalScore = 0
+    for score in scores[0]["Scores"]:
+        totalScore += score
+
+    average = round(totalScore / len(scores[0]["Scores"]), 1)
+    
+    embed.add_field(name="Average Score", value=average, inline=False)
     
     today = date.today().strftime("%B %d, %Y")
     time = datetime.now(pytz.timezone("US/Eastern")).strftime("%I:%M %p")
