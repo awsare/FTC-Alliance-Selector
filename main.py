@@ -299,14 +299,14 @@ async def stats(ctx, team_num, season_num = None):
             break
         highestField += f"{score}, "
     
-    highestField = highestField[0:len(highestField)-2]
+    highestField = highestField[0:len(highestField)-2] + " points"
 
     average = round(totalScore / len(scores[team_num]["Scores"]), 1)
     wlpercent = round(totalW/len(scores[team_num]["WL"]) * 100, 1)
     
-    embed.add_field(name="Average Score", value=average, inline=False)
+    embed.add_field(name="Average Score", value=f"{average} points", inline=False)
     embed.add_field(name="Highest Scores", value=highestField, inline=False)
-    embed.add_field(name="Win Rate", value=wlpercent, inline=False)
+    embed.add_field(name="Win Rate", value=f"{wlpercent}%", inline=False)
     
     today = date.today().strftime("%B %d, %Y")
     time = datetime.now(pytz.timezone("US/Eastern")).strftime("%I:%M %p")
