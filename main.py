@@ -281,10 +281,10 @@ async def stats(ctx, team_num, season_num = None):
     embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
 
     totalScore = 0
-    for score in scores[0]["Scores"]:
+    for score in scores[team_num]["Scores"]:
         totalScore += score
 
-    average = round(totalScore / len(scores[0]["Scores"]), 1)
+    average = round(totalScore / len(scores[team_num]["Scores"]), 1)
     
     embed.add_field(name="Average Score", value=average, inline=False)
     
