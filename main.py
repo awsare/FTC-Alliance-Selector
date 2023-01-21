@@ -297,10 +297,12 @@ async def stats(ctx, team_num, season_num = None):
     for index, score in enumerate(highestScores):
         if index > ROW_COUNT - 1:
             break
-        highestField += f"{score}\n"
+        highestField += f"{score}, "
+    
+    highestField = highestField[0:len(highestField)-2]
 
     average = round(totalScore / len(scores[team_num]["Scores"]), 1)
-    wlpercent = round(totalW/len(scores[team_num]["WL"]), 2) * 100
+    wlpercent = round(totalW/len(scores[team_num]["WL"]), 3) * 100
     
     embed.add_field(name="Average Score", value=average, inline=False)
     embed.add_field(name="Highest Scores", value=highestField, inline=False)
