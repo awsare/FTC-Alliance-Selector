@@ -139,7 +139,7 @@ async def alliances(ctx, team_num, season_num = None):
                 totalW += 1
 
         average = round(totalScore / len(info["Scores"]), 1)
-        wlpercent = round(totalW/len(info["WL"]), 2) * 100
+        wlpercent = round(totalW/len(info["WL"]) * 100, 1)
         scores[team]["Average"] = average
         scores[team]["Highest"] = highest
         scores[team]["Win Rate"] = wlpercent
@@ -302,7 +302,7 @@ async def stats(ctx, team_num, season_num = None):
     highestField = highestField[0:len(highestField)-2]
 
     average = round(totalScore / len(scores[team_num]["Scores"]), 1)
-    wlpercent = round(totalW/len(scores[team_num]["WL"]), 3) * 100
+    wlpercent = round(totalW/len(scores[team_num]["WL"]) * 100, 1)
     
     embed.add_field(name="Average Score", value=average, inline=False)
     embed.add_field(name="Highest Scores", value=highestField, inline=False)
