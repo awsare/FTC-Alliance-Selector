@@ -251,27 +251,31 @@ async def stats(ctx, team_num, season_num = None):
                         bluewl = match["scoreRedFinal"] < match["scoreBlueFinal"]
                     if team["station"] == "Red1":
                         if match["teams"][0]["teamNumber"] not in scores:
-                            scores[match["teams"][0]["teamNumber"]] = {"Scores":[match["scoreRedFinal"]], "WL":[redwl]}
+                            scores[match["teams"][0]["teamNumber"]] = {"Scores":[match["scoreRedFinal"]], "Autos":[match["scoreRedAuto"]], "WL":[redwl]}
                         else:
                             scores[match["teams"][0]["teamNumber"]]["Scores"].append(match["scoreRedFinal"])
+                            scores[match["teams"][0]["teamNumber"]]["Autos"].append(match["scoreRedAuto"])
                             scores[match["teams"][0]["teamNumber"]]["WL"].append(redwl)
                     elif team["station"] == "Red2":
                         if match["teams"][1]["teamNumber"] not in scores:
-                            scores[match["teams"][1]["teamNumber"]] = {"Scores":[match["scoreRedFinal"]], "WL":[redwl]}
+                            scores[match["teams"][1]["teamNumber"]] = {"Scores":[match["scoreRedFinal"]], "Autos":[match["scoreRedAuto"]], "WL":[redwl]}
                         else:
                             scores[match["teams"][1]["teamNumber"]]["Scores"].append(match["scoreRedFinal"])
+                            scores[match["teams"][1]["teamNumber"]]["Autos"].append(match["scoreRedAuto"])
                             scores[match["teams"][1]["teamNumber"]]["WL"].append(redwl)
                     elif team["station"] == "Blue1":
                         if match["teams"][2]["teamNumber"] not in scores:
-                            scores[match["teams"][2]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]], "WL":[bluewl]}
+                            scores[match["teams"][2]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]], "Autos":[match["scoreBlueAuto"]], "WL":[bluewl]}
                         else:
                             scores[match["teams"][2]["teamNumber"]]["Scores"].append(match["scoreBlueFinal"])
+                            scores[match["teams"][2]["teamNumber"]]["Autos"].append(match["scoreBlueAuto"])
                             scores[match["teams"][2]["teamNumber"]]["WL"].append(bluewl)
                     elif team["station"] == "Blue2":
                         if match["teams"][3]["teamNumber"] not in scores:
-                            scores[match["teams"][3]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]], "WL":[bluewl]}
+                            scores[match["teams"][3]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]], "Autos":[match["scoreBlueAuto"]], "WL":[bluewl]}
                         else:
                             scores[match["teams"][3]["teamNumber"]]["Scores"].append(match["scoreBlueFinal"])
+                            scores[match["teams"][3]["teamNumber"]]["Autos"].append(match["scoreBlueAuto"])
                             scores[match["teams"][3]["teamNumber"]]["WL"].append(bluewl)
                     break
 
@@ -286,26 +290,42 @@ async def stats(ctx, team_num, season_num = None):
         highestScores.append(score)
         totalScore += score
 
+    totalAuto = 0
+    highestAutos = []
+    for auto in scores[team_num]["Autos"]:
+        highestAutos.append(auto)
+        totalAuto += auto
+
     totalW = 0
     for wl in scores[team_num]["WL"]:
         if (wl == True):
             totalW += 1
 
     highestScores.sort(reverse=True)
-
-    highestField = ""
+    highestScoreField = ""
     for index, score in enumerate(highestScores):
         if index > ROW_COUNT - 1:
             break
-        highestField += f"{score}, "
-    
-    highestField = highestField[0:len(highestField)-2] + " points"
+        highestScoreField += f"{score}, "
 
-    average = round(totalScore / len(scores[team_num]["Scores"]), 1)
+    highestAutos.sort(reverse=True)
+    highestAutoField = ""
+    for index, auto in enumerate(highestAutos):
+        if index > ROW_COUNT - 1:
+            break
+        highestAutoField += f"{auto}, "
+    
+    highestScoreField = highestScoreField[0:len(highestScoreField)-2] + " points"
+    highestAutoField = highestAutoField[0:len(highestAutoField)-2] + " points"
+
+    averageScore = round(totalScore / len(scores[team_num]["Scores"]), 1)
+    averageAuto = round(totalAuto / len(scores[team_num]["Autos"]), 1)
     wlpercent = round(totalW/len(scores[team_num]["WL"]) * 100, 1)
     
-    embed.add_field(name="Average Score", value=f"{average} points", inline=False)
-    embed.add_field(name="Highest Scores", value=highestField, inline=False)
+    embed.add_field(name="Average Score", value=f"{averageScore} points", inline=False)
+    embed.add_field(name="Highest Scores", value=highestScoreField, inline=False)
+    embed.add_field(name="Average Auto", value=f"{averageAuto} points", inline=False)
+    embed.add_field(name="Highest Autos", value=highestAutoField, inline=False)
     embed.add_field(name="Win Rate", value=f"{wlpercent}%", inline=False)
     
     today = date.today().strftime("%B %d, %Y")
