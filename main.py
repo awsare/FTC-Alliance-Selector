@@ -261,21 +261,21 @@ async def stats(ctx, team_num, season_num = None):
                             scores[match["teams"][1]["teamNumber"]] = {"Scores":[match["scoreRedFinal"]], "Autos":[match["scoreRedAuto"]], "WL":[redwl]}
                         else:
                             scores[match["teams"][1]["teamNumber"]]["Scores"].append(match["scoreRedFinal"])
-                            scores[match["teams"][0]["teamNumber"]]["Autos"].append(match["scoreRedAuto"])
+                            scores[match["teams"][1]["teamNumber"]]["Autos"].append(match["scoreRedAuto"])
                             scores[match["teams"][1]["teamNumber"]]["WL"].append(redwl)
                     elif team["station"] == "Blue1":
                         if match["teams"][2]["teamNumber"] not in scores:
                             scores[match["teams"][2]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]], "Autos":[match["scoreBlueAuto"]], "WL":[bluewl]}
                         else:
                             scores[match["teams"][2]["teamNumber"]]["Scores"].append(match["scoreBlueFinal"])
-                            scores[match["teams"][0]["teamNumber"]]["Autos"].append(match["scoreBlueAuto"])
+                            scores[match["teams"][2]["teamNumber"]]["Autos"].append(match["scoreBlueAuto"])
                             scores[match["teams"][2]["teamNumber"]]["WL"].append(bluewl)
                     elif team["station"] == "Blue2":
                         if match["teams"][3]["teamNumber"] not in scores:
                             scores[match["teams"][3]["teamNumber"]] = {"Scores":[match["scoreBlueFinal"]], "Autos":[match["scoreBlueAuto"]], "WL":[bluewl]}
                         else:
                             scores[match["teams"][3]["teamNumber"]]["Scores"].append(match["scoreBlueFinal"])
-                            scores[match["teams"][0]["teamNumber"]]["Autos"].append(match["scoreBlueAuto"])
+                            scores[match["teams"][3]["teamNumber"]]["Autos"].append(match["scoreBlueAuto"])
                             scores[match["teams"][3]["teamNumber"]]["WL"].append(bluewl)
                     break
 
